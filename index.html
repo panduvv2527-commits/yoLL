@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#05060f" />
+<meta name="description" content="yoLl — a curated directory of AI tools for images, writing, coding, video, audio and more." />
+<title>yoLl — AI Tools Directory</title>
+
+<!-- Prevent theme flash: runs before paint -->
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('yoll-theme');
+      if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   THEME TOKENS
+   ============================================================ */
+:root {
+  --bg-1:#05060f; --bg-2:#0b0e1f; --bg-3:#131736;
+  --text:#eef1ff; --muted:#9aa3c7;
+  --card-bg:rgba(20,24,48,0.88);
+  --card-border:rgba(140,160,255,0.16);
+  --accent:#7c5cff; --accent-2:#22d3ee; --accent-3:#ff4ecd;
+  --green:#22c55e; --yellow:#eab308; --red:#ef4444;
+  --shadow:0 18px 36px -18px rgba(0,0,0,0.6);
+  --radius:18px;
+  --radius-sm:11px;
+  --gap:18px;
+  --maxw:1200px;
+  --pad-x:18px;
+}
+[data-theme="light"] {
+  --bg-1:#eef1ff; --bg-2:#e2e7ff; --bg-3:#d5dcff;
+  --text:#10122a; --muted:#4a5080;
+  --card-bg:rgba(255,255,255,0.92);
+  --card-border:rgba(60,80,180,0.16);
+  --shadow:0 18px 36px -18px rgba(60,70,150,0.35);
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg-1);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  transition: background .4s, color .4s;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+img, svg { display: block; max-width: 100%; }
+button, input { font: inherit; color: inherit; }
+a { color: inherit; }
+
+/* ============================================================
+   BACKGROUND
+   ============================================================ */
+.bg-layer {
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(124,92,255,0.28), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(34,211,238,0.22), transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(255,78,205,0.22), transparent 55%),
+    linear-gradient(160deg, var(--bg-1), var(--bg-2), var(--bg-3));
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 12px var(--pad-x);
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: clamp(1.1rem, 3vw, 1.3rem);
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.logo small {
+  opacity: .55; font-weight: 400;
+  font-size: clamp(.65rem, 2vw, .75rem);
+  margin-left: 4px;
+}
+.theme-toggle {
+  width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  cursor: pointer; font-size: 1rem;
+  display: grid; place-items: center;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: var(--shadow);
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-toggle:hover { transform: translateY(-2px); }
+.theme-toggle:active { transform: scale(.95); }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  text-align: center;
+  padding: clamp(36px, 8vw, 64px) var(--pad-x) clamp(20px, 4vw, 30px);
+}
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.75rem, 7vw, 4.2rem);
+  font-weight: 700; letter-spacing: -0.03em; line-height: 1.05;
+  background: linear-gradient(135deg, #fff 10%, var(--accent-2) 50%, var(--accent-3) 95%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-wrap: balance;
+}
+[data-theme="light"] .hero h1 {
+  background: linear-gradient(135deg, var(--accent) 10%, var(--accent-2) 50%, var(--accent-3) 95%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero p {
+  margin-top: 14px; color: var(--muted);
+  font-size: clamp(.9rem, 2.1vw, 1.08rem);
+  max-width: 600px; margin-left: auto; margin-right: auto;
+  text-wrap: pretty;
+}
+.hero .count {
+  display: inline-block; margin-top: 20px; padding: 6px 14px;
+  border-radius: 999px; font-size: .78rem; font-weight: 600;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  box-shadow: 0 8px 20px -8px rgba(124,92,255,0.6);
+}
+
+/* ============================================================
+   CONTROLS
+   ============================================================ */
+.controls {
+  max-width: var(--maxw); margin: 14px auto 0;
+  padding: 0 var(--pad-x);
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.search-wrap { position: relative; }
+.search-wrap input {
+  width: 100%;
+  padding: 14px 18px 14px 46px;
+  border-radius: 14px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color .25s, box-shadow .25s;
+  box-shadow: var(--shadow);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.search-wrap input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124,92,255,0.25);
+}
+.search-wrap input::-webkit-search-cancel-button { display: none; }
+.search-wrap .icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 1rem; pointer-events: none;
+}
+
+/* ============================================================
+   CHIPS — horizontal scroll on mobile, wrap on desktop
+   ============================================================ */
+.chips {
+  display: flex; gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+  padding-bottom: 4px;
+  margin: 0 calc(var(--pad-x) * -1);
+  padding-left: var(--pad-x);
+  padding-right: var(--pad-x);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.chips::-webkit-scrollbar { display: none; }
+
+@media (min-width: 720px) {
+  .chips {
+    flex-wrap: wrap;
+    overflow: visible;
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+    scroll-snap-type: none;
+  }
+}
+
+.chip {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .2s, color .2s, transform .15s, border-color .2s;
+  -webkit-tap-highlight-color: transparent;
+  scroll-snap-align: start;
+  user-select: none;
+}
+.chip:active { transform: scale(.96); }
+.chip.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 8px 18px -8px rgba(124,92,255,0.55);
+}
+
+/* ============================================================
+   GRID — fluid, responsive
+   ============================================================ */
+.grid {
+  max-width: var(--maxw);
+  margin: clamp(20px, 4vw, 26px) auto clamp(48px, 8vw, 70px);
+  padding: 0 var(--pad-x);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: var(--gap);
+  contain: layout paint;
+}
+
+/* Tighten spacing on small screens */
+@media (max-width: 640px) {
+  :root { --pad-x: 14px; --gap: 14px; --radius: 16px; }
+}
+
+/* ============================================================
+   CARD
+   ============================================================ */
+.card {
+  position: relative;
+  border-radius: var(--radius);
+  padding: clamp(16px, 3vw, 20px);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  translate: 0 20px;
+  transition: opacity .45s ease, translate .45s ease,
+              box-shadow .3s ease, transform .3s ease;
+  will-change: transform, opacity;
+  display: flex;
+  flex-direction: column;
+}
+.card.reveal { opacity: 1; translate: 0 0; }
+.card:hover {
+  box-shadow: 0 24px 48px -20px rgba(124,92,255,0.45), var(--shadow);
+}
+
+/* Cursor-follow glow — desktop only */
+@media (hover: hover) and (pointer: fine) {
+  .card::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: var(--radius);
+    background: radial-gradient(
+      220px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.10), transparent 50%
+    );
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+  }
+  .card:hover::before { opacity: 1; }
+}
+
+.card-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 10px; margin-bottom: 10px;
+}
+.card-icon {
+  width: clamp(40px, 9vw, 44px);
+  height: clamp(40px, 9vw, 44px);
+  border-radius: 12px;
+  display: grid; place-items: center;
+  font-size: clamp(1.15rem, 3vw, 1.35rem);
+  background: linear-gradient(135deg, rgba(124,92,255,0.35), rgba(34,211,238,0.3));
+  box-shadow: 0 6px 16px rgba(124,92,255,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+.badge {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: .03em;
+  padding: 5px 10px; border-radius: 999px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.badge.free     { background: rgba(34,197,94,0.18); color: var(--green);  border: 1px solid rgba(34,197,94,0.4); }
+.badge.freemium { background: rgba(234,179,8,0.18); color: var(--yellow); border: 1px solid rgba(234,179,8,0.4); }
+.badge.paid     { background: rgba(239,68,68,0.18); color: var(--red);    border: 1px solid rgba(239,68,68,0.4); }
+
+.card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1rem, 2.4vw, 1.1rem);
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+.card p {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.55;
+  flex-grow: 1;
+  overflow-wrap: anywhere;
+}
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.cat-tag {
+  font-size: 0.7rem; color: var(--muted);
+  padding: 4px 10px; border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--card-border);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 100%;
+}
+[data-theme="light"] .cat-tag { background: rgba(0,0,0,0.03); }
+
+.visit {
+  text-decoration: none;
+  font-size: 0.82rem; font-weight: 600;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  transition: transform .15s, box-shadow .2s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  margin-left: auto;
+}
+.visit:hover { box-shadow: 0 10px 22px rgba(124,92,255,0.55); }
+.visit:active { transform: scale(.96); }
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: clamp(40px, 10vw, 60px) 20px;
+  color: var(--muted);
+}
+.empty .big { font-size: clamp(2.2rem, 8vw, 3rem); margin-bottom: 10px; }
+.empty .reset {
+  margin-top: 16px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: .85rem; font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s, border-color .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.empty .reset:hover { border-color: var(--accent); }
+.empty .reset:active { transform: scale(.96); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  text-align: center;
+  padding: clamp(28px, 5vw, 36px) var(--pad-x) clamp(20px, 4vw, 26px);
+  padding-bottom: calc(clamp(20px, 4vw, 26px) + env(safe-area-inset-bottom, 0px));
+  color: var(--muted); font-size: 0.82rem;
+  border-top: 1px solid var(--card-border);
+  line-height: 1.7;
+}
+footer strong {
+  background: linear-gradient(135deg, var(--accent), var(--accent-3));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* ============================================================
+   TOUCH DEVICES — kill hover
+   ============================================================ */
+@media (hover: none) {
+  .card:hover { box-shadow: var(--shadow); }
+  .visit:hover { box-shadow: none; }
+  .theme-toggle:hover { transform: none; }
+  .card { transition: opacity .35s ease, translate .35s ease; }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .card { opacity: 1; translate: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo">yoLl<small>AI Directory</small></div>
+  <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌙</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>The AI Tools Universe</h1>
+  <p>Discover the best AI tools for images, writing, coding, video, audio and more — free, freemium, and premium, all in one directory.</p>
+  <div class="count" id="count" role="status" aria-live="polite">Loading…</div>
+</section>
+
+<!-- CONTROLS -->
+<section class="controls" aria-label="Filters">
+  <div class="search-wrap">
+    <span class="icon" aria-hidden="true">🔎</span>
+    <input
+      type="search"
+      id="search"
+      placeholder="Search tools…"
+      aria-label="Search tools"
+      autocomplete="off"
+      spellcheck="false"
+    >
+  </div>
+  <div class="chips" id="catChips" role="tablist" aria-label="Categories"></div>
+  <div class="chips" id="priceChips" role="tablist" aria-label="Pricing"></div>
+</section>
+
+<!-- GRID -->
+<main class="grid" id="grid" aria-live="polite"></main>
+
+<!-- FOOTER -->
+<footer>
+  Built with 💜 by <strong>yoLl</strong> · A curated AI tools directory · <span id="year"></span>
+</footer>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const tools = [
+  // 🖼️ IMAGE
+  { n:"Midjourney", d:"Stunning AI art from text prompts, known for artistic quality.", c:"Image", p:"paid", u:"https://midjourney.com", i:"🖼️" },
+  { n:"DALL·E 3", d:"OpenAI's image generator integrated in ChatGPT & Bing.", c:"Image", p:"freemium", u:"https://openai.com/dall-e-3", i:"🎨" },
+  { n:"Stable Diffusion", d:"Open-source image model you can run locally or in the cloud.", c:"Image", p:"free", u:"https://stability.ai", i:"🌌" },
+  { n:"Leonardo AI", d:"Game-art focused image generation with fine-tuned models.", c:"Image", p:"freemium", u:"https://leonardo.ai", i:"🖌️" },
+  { n:"Adobe Firefly", d:"Adobe's generative AI for images, integrated into Creative Cloud.", c:"Image", p:"freemium", u:"https://firefly.adobe.com", i:"🔥" },
+  { n:"Ideogram", d:"AI image generator that renders text inside images accurately.", c:"Image", p:"freemium", u:"https://ideogram.ai", i:"💡" },
+
+  // ✍️ WRITING
+  { n:"ChatGPT", d:"OpenAI's conversational AI for writing, Q&A, and creativity.", c:"Writing", p:"freemium", u:"https://chat.openai.com", i:"✍️" },
+  { n:"Claude", d:"Anthropic's thoughtful AI assistant, great for long documents.", c:"Writing", p:"freemium", u:"https://claude.ai", i:"📝" },
+  { n:"Jasper", d:"AI marketing copywriter for blogs, ads, and social posts.", c:"Writing", p:"paid", u:"https://jasper.ai", i:"🪄" },
+  { n:"Copy.ai", d:"Generate marketing copy, sales emails and blog ideas fast.", c:"Writing", p:"freemium", u:"https://copy.ai", i:"✒️" },
+  { n:"Grammarly", d:"AI writing assistant for grammar, tone, and clarity.", c:"Writing", p:"freemium", u:"https://grammarly.com", i:"✅" },
+  { n:"Writesonic", d:"AI writer for SEO articles, ads and product descriptions.", c:"Writing", p:"freemium", u:"https://writesonic.com", i:"📰" },
+
+  // 💻 CODING
+  { n:"GitHub Copilot", d:"AI pair programmer that autocompletes code in your editor.", c:"Coding", p:"paid", u:"https://github.com/features/copilot", i:"🐙" },
+  { n:"Cursor", d:"AI-first code editor built for pair-programming with AI.", c:"Coding", p:"freemium", u:"https://cursor.sh", i:"⚡" },
+  { n:"Tabnine", d:"Privacy-focused AI code completion for teams.", c:"Coding", p:"freemium", u:"https://tabnine.com", i:"🧩" },
+  { n:"Replit AI", d:"AI assistant inside Replit IDE for code, debug and deploy.", c:"Coding", p:"freemium", u:"https://replit.com", i:"🛠️" },
+  { n:"Codeium", d:"Free AI autocomplete & chat for 70+ languages.", c:"Coding", p:"free", u:"https://codeium.com", i:"💠" },
+  { n:"Amazon CodeWhisperer", d:"AWS's AI coding companion, free for individuals.", c:"Coding", p:"freemium", u:"https://aws.amazon.com/codewhisperer", i:"📦" },
+
+  // 🎬 VIDEO
+  { n:"Runway", d:"AI video generation and editing suite (Gen-3).", c:"Video", p:"freemium", u:"https://runwayml.com", i:"🎬" },
+  { n:"Pika", d:"Turn text or images into short cinematic AI videos.", c:"Video", p:"freemium", u:"https://pika.art", i:"🎥" },
+  { n:"Sora", d:"OpenAI's text-to-video model for realistic clips.", c:"Video", p:"paid", u:"https://openai.com/sora", i:"🌀" },
+  { n:"Synthesia", d:"Create AI avatar videos for training & marketing.", c:"Video", p:"paid", u:"https://synthesia.io", i:"🧑‍💼" },
+  { n:"HeyGen", d:"AI spokesperson videos with realistic avatars & voice clones.", c:"Video", p:"freemium", u:"https://heygen.com", i:"🗣️" },
+  { n:"Luma Dream Machine", d:"High-quality AI video generation from text/images.", c:"Video", p:"freemium", u:"https://lumalabs.ai/dream-machine", i:"🌠" },
+
+  // 🎵 AUDIO
+  { n:"Suno", d:"Generate full songs with vocals from a text prompt.", c:"Audio", p:"freemium", u:"https://suno.com", i:"🎵" },
+  { n:"ElevenLabs", d:"Ultra-realistic AI voice generation and cloning.", c:"Audio", p:"freemium", u:"https://elevenlabs.io", i:"🔊" },
+  { n:"Murf AI", d:"Studio-quality AI voiceovers for videos & ads.", c:"Audio", p:"freemium", u:"https://murf.ai", i:"🎙️" },
+  { n:"AIVA", d:"AI composer for cinematic and background music.", c:"Audio", p:"freemium", u:"https://aiva.ai", i:"🎼" },
+  { n:"Udio", d:"AI music generation rival to Suno, with strong vocals.", c:"Audio", p:"freemium", u:"https://udio.com", i:"🎧" },
+  { n:"Play.ht", d:"Realistic AI text-to-speech for podcasts & articles.", c:"Audio", p:"freemium", u:"https://play.ht", i:"📢" },
+
+  // 📊 PRODUCTIVITY
+  { n:"Notion AI", d:"AI writing, summarizing & Q&A inside Notion.", c:"Productivity", p:"paid", u:"https://notion.so/product/ai", i:"📓" },
+  { n:"Mem", d:"AI-powered notes that organize themselves.", c:"Productivity", p:"freemium", u:"https://mem.ai", i:"🧠" },
+  { n:"Taskade", d:"AI to-do lists, mind maps and team workspaces.", c:"Productivity", p:"freemium", u:"https://taskade.com", i:"✅" },
+  { n:"Motion", d:"AI calendar that auto-plans your day and tasks.", c:"Productivity", p:"paid", u:"https://usemotion.com", i:"📅" },
+  { n:"Reclaim AI", d:"AI scheduling for habits, tasks and meetings.", c:"Productivity", p:"freemium", u:"https://reclaim.ai", i:"⏱️" },
+
+  // 🔍 RESEARCH
+  { n:"Perplexity", d:"AI answer engine with cited, real-time web sources.", c:"Research", p:"freemium", u:"https://perplexity.ai", i:"🔍" },
+  { n:"Elicit", d:"AI research assistant for literature reviews.", c:"Research", p:"freemium", u:"https://elicit.com", i:"📚" },
+  { n:"Consensus", d:"Search scientific papers and get AI summaries.", c:"Research", p:"freemium", u:"https://consensus.app", i:"🔬" },
+  { n:"Scite", d:"AI-powered citation and reference checking.", c:"Research", p:"freemium", u:"https://scite.ai", i:"📑" },
+  { n:"You.com", d:"AI search engine with multi-model chat.", c:"Research", p:"freemium", u:"https://you.com", i:"🌐" },
+
+  // 🎨 DESIGN
+  { n:"Figma AI", d:"AI features inside Figma for design and prototyping.", c:"Design", p:"freemium", u:"https://figma.com", i:"🎨" },
+  { n:"Uizard", d:"Turn text or sketches into editable UI designs.", c:"Design", p:"freemium", u:"https://uizard.io", i:"📱" },
+  { n:"Galileo AI", d:"Generate beautiful UI from a text prompt.", c:"Design", p:"paid", u:"https://usegalileo.ai", i:"✨" },
+  { n:"Framer AI", d:"Generate and publish full websites with AI.", c:"Design", p:"freemium", u:"https://framer.com", i:"🖥️" },
+  { n:"Khroma", d:"AI color palette generator that learns your taste.", c:"Design", p:"free", u:"https://khroma.co", i:"🌈" },
+
+  // 🤖 CHATBOTS
+  { n:"Gemini", d:"Google's multimodal AI assistant across apps.", c:"Chatbots", p:"freemium", u:"https://gemini.google.com", i:"♊" },
+  { n:"Grok", d:"xAI's witty chatbot with real-time X data.", c:"Chatbots", p:"freemium", u:"https://grok.com", i:"🤖" },
+  { n:"Poe", d:"Quora's hub to chat with many AI models in one app.", c:"Chatbots", p:"freemium", u:"https://poe.com", i:"💬" },
+  { n:"Character.AI", d:"Chat with AI characters and custom personas.", c:"Chatbots", p:"freemium", u:"https://character.ai", i:"🎭" },
+  { n:"Pi", d:"Inflection's empathetic personal AI companion.", c:"Chatbots", p:"free", u:"https://pi.ai", i:"🫧" },
+
+  // 📈 MARKETING
+  { n:"Surfer SEO", d:"AI-driven SEO content optimization and audits.", c:"Marketing", p:"paid", u:"https://surferseo.com", i:"📈" },
+  { n:"AdCreative.ai", d:"Generate high-converting ad creatives with AI.", c:"Marketing", p:"paid", u:"https://adcreative.ai", i:"📣" },
+  { n:"Brandwell", d:"AI content + SEO writer for brands (formerly Content at Scale).", c:"Marketing", p:"paid", u:"https://brandwell.ai", i:"🏷️" },
+  { n:"Frase", d:"AI research & content briefs for SEO writers.", c:"Marketing", p:"freemium", u:"https://frase.io", i:"🔎" },
+  { n:"HubSpot AI", d:"AI content, email and CRM assistance for marketers.", c:"Marketing", p:"freemium", u:"https://hubspot.com/artificial-intelligence", i:"🧲" }
+];
+
+/* Pre-normalize search text once (perf) */
+tools.forEach(t => {
+  t._search = (t.n + ' ' + t.d + ' ' + t.c).toLowerCase();
+});
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = { cat: "All", price: "All", q: "" };
+const catIcons = {
+  All: "🌟", Image: "🖼️", Writing: "✍️", Coding: "💻", Video: "🎬",
+  Audio: "🎵", Productivity: "📊", Research: "🔍",
+  Design: "🎨", Chatbots: "🤖", Marketing: "📈"
+};
+const categories = ["All","Image","Writing","Coding","Video","Audio","Productivity","Research","Design","Chatbots","Marketing"];
+const priceLabels = { All: "All Prices", free: "Free", freemium: "Freemium", paid: "Paid" };
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const grid = document.getElementById("grid");
+const searchInput = document.getElementById("search");
+const catChips = document.getElementById("catChips");
+const priceChips = document.getElementById("priceChips");
+const countEl = document.getElementById("count");
+const themeBtn = document.getElementById("themeBtn");
+const root = document.documentElement;
+
+/* ============================================================
+   CHIPS
+   ============================================================ */
+function buildChips() {
+  const catFrag = document.createDocumentFragment();
+  categories.forEach(c => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip" + (c === state.cat ? " active" : "");
+    b.textContent = `${catIcons[c]} ${c}`;
+    b.dataset.cat = c;
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", c === state.cat ? "true" : "false");
+    b.addEventListener("click", () => {
+      state.cat = c;
+      refreshChips();
+      render();
+    });
+    catFrag.appendChild(b);
+  });
+  catChips.replaceChildren(catFrag);
+
+  const priceFrag = document.createDocumentFragment();
+  Object.keys(priceLabels).forEach(p => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip" + (p === state.price ? " active" : "");
+    b.textContent = priceLabels[p];
+    b.dataset.price = p;
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", p === state.price ? "true" : "false");
+    b.addEventListener("click", () => {
+      state.price = p;
+      refreshChips();
+      render();
+    });
+    priceFrag.appendChild(b);
+  });
+  priceChips.replaceChildren(priceFrag);
+}
+
+function refreshChips() {
+  [...catChips.children].forEach(b => {
+    const active = b.dataset.cat === state.cat;
+    b.classList.toggle("active", active);
+    b.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  [...priceChips.children].forEach(b => {
+    const active = b.dataset.price === state.price;
+    b.classList.toggle("active", active);
+    b.setAttribute("aria-selected", active ? "true" : "false");
+  });
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+let revealObserver = null;
+
+function initObserver() {
+  if (!("IntersectionObserver" in window)) return;
+  revealObserver = new IntersectionObserver(
+    entries => {
+      for (const en of entries) {
+        if (en.isIntersecting) {
+          en.target.classList.add("reveal");
+          revealObserver.unobserve(en.target);
+        }
+      }
+    },
+    { rootMargin: "0px 0px -40px 0px", threshold: 0.01 }
+  );
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
+}
+
+function safeURL(u) {
+  // Only allow http(s) URLs; fall back to '#'
+  try {
+    const url = new URL(u, location.href);
+    return (url.protocol === "http:" || url.protocol === "https:") ? url.href : "#";
+  } catch { return "#"; }
+}
+
+function buildCard(t) {
+  const card = document.createElement("article");
+  card.className = "card";
+
+  const header = document.createElement("div");
+  header.className = "card-header";
+  header.innerHTML = `
+    <div class="card-icon" aria-hidden="true">${escapeHTML(t.i)}</div>
+    <span class="badge ${escapeHTML(t.p)}">${escapeHTML(t.p)}</span>
+  `;
+
+  const h3 = document.createElement("h3");
+  h3.textContent = t.n;
+
+  const p = document.createElement("p");
+  p.textContent = t.d;
+
+  const footer = document.createElement("div");
+  footer.className = "card-footer";
+  footer.innerHTML = `
+    <span class="cat-tag">${escapeHTML(catIcons[t.c] || "")} ${escapeHTML(t.c)}</span>
+  `;
+  const visit = document.createElement("a");
+  visit.className = "visit";
+  visit.href = safeURL(t.u);
+  visit.target = "_blank";
+  visit.rel = "noopener noreferrer";
+  visit.textContent = "Visit →";
+  footer.appendChild(visit);
+
+  card.append(header, h3, p, footer);
+  return card;
+}
+
+function render() {
+  const q = state.q.trim().toLowerCase();
+
+  const list = tools.filter(t => {
+    if (state.cat !== "All" && t.c !== state.cat) return false;
+    if (state.price !== "All" && t.p !== state.price) return false;
+    if (q && !t._search.includes(q)) return false;
+    return true;
+  });
+
+  countEl.textContent = q || state.cat !== "All" || state.price !== "All"
+    ? `${list.length} of ${tools.length} tools`
+    : `${tools.length} tools`;
+
+  const frag = document.createDocumentFragment();
+
+  if (!list.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.innerHTML = `
+      <div class="big" aria-hidden="true">🛸</div>
+      <div>No tools match your filters.</div>
+    `;
+    const resetBtn = document.createElement("button");
+    resetBtn.type = "button";
+    resetBtn.className = "reset";
+    resetBtn.textContent = "Clear filters";
+    resetBtn.addEventListener("click", () => {
+      state.cat = "All";
+      state.price = "All";
+      state.q = "";
+      searchInput.value = "";
+      refreshChips();
+      render();
+    });
+    empty.appendChild(resetBtn);
+    frag.appendChild(empty);
+  } else {
+    for (const t of list) frag.appendChild(buildCard(t));
+  }
+
+  grid.replaceChildren(frag);
+
+  const cards = grid.querySelectorAll(".card");
+  if (revealObserver) {
+    cards.forEach(c => revealObserver.observe(c));
+  } else {
+    cards.forEach(c => c.classList.add("reveal"));
+  }
+
+  if (isHoverable) cards.forEach(attach3DTilt);
+}
+
+/* ============================================================
+   3D TILT — desktop only, rAF-throttled
+   ============================================================ */
+let isHoverable = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+if (window.matchMedia) {
+  const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+  const onChange = e => { isHoverable = e.matches; };
+  if (mq.addEventListener) mq.addEventListener("change", onChange);
+  else if (mq.addListener) mq.addListener(onChange);
+}
+
+function attach3DTilt(card) {
+  let raf = 0, rx = 0, ry = 0, mx = 0, my = 0;
+
+  const onMove = e => {
+    const r = card.getBoundingClientRect();
+    mx = e.clientX - r.left;
+    my = e.clientY - r.top;
+    rx = ((my - r.height / 2) / (r.height / 2)) * -6;
+    ry = ((mx - r.width / 2) / (r.width / 2)) * 6;
+    if (!raf) {
+      raf = requestAnimationFrame(() => {
+        card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
+        card.style.setProperty("--mx", mx + "px");
+        card.style.setProperty("--my", my + "px");
+        raf = 0;
+      });
+    }
+  };
+
+  const onLeave = () => {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    card.style.transform = "";
+  };
+
+  card.addEventListener("mousemove", onMove);
+  card.addEventListener("mouseleave", onLeave);
+}
+
+/* ============================================================
+   SEARCH — debounced
+   ============================================================ */
+let searchTimer;
+searchInput.addEventListener("input", e => {
+  clearTimeout(searchTimer);
+  const value = e.target.value;
+  searchTimer = setTimeout(() => {
+    state.q = value;
+    render();
+  }, 120);
+});
+
+/* ============================================================
+   THEME
+   ============================================================ */
+function syncThemeButton() {
+  themeBtn.textContent = root.dataset.theme === "dark" ? "🌙" : "☀️";
+}
+syncThemeButton();
+
+themeBtn.addEventListener("click", () => {
+  const next = root.dataset.theme === "dark" ? "light" : "dark";
+  root.dataset.theme = next;
+  themeBtn.textContent = next === "dark" ? "🌙" : "☀️";
+  try { localStorage.setItem("yoll-theme", next); } catch (e) {}
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = next === "dark" ? "#05060f" : "#eef1ff";
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.getElementById("year").textContent = new Date().getFullYear();
+initObserver();
+buildChips();
+render();
+</script>
+</body>
+</html>
