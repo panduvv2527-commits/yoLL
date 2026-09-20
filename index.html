@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>yoLl — AI Tools Directory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ ROOT & THEME ============ */
+:root {
+  --bg-1: #05060f;
+  --bg-2: #0b0e1f;
+  --bg-3: #131736;
+  --text: #eef1ff;
+  --muted: #9aa3c7;
+  --card-bg: rgba(20, 24, 48, 0.55);
+  --card-border: rgba(140, 160, 255, 0.18);
+  --accent: #7c5cff;
+  --accent-2: #22d3ee;
+  --accent-3: #ff4ecd;
+  --green: #22c55e;
+  --yellow: #eab308;
+  --red: #ef4444;
+  --shadow-lg: 0 30px 60px -20px rgba(0,0,0,0.7), 0 12px 30px -12px rgba(124,92,255,0.35);
+  --glass: rgba(255,255,255,0.06);
+}
+[data-theme="light"] {
+  --bg-1: #eef1ff;
+  --bg-2: #e2e7ff;
+  --bg-3: #d5dcff;
+  --text: #10122a;
+  --muted: #4a5080;
+  --card-bg: rgba(255,255,255,0.7);
+  --card-border: rgba(60, 80, 180, 0.18);
+  --glass: rgba(255,255,255,0.5);
+  --shadow-lg: 0 30px 60px -20px rgba(60,70,150,0.35), 0 12px 30px -12px rgba(124,92,255,0.25);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.5s, color 0.5s;
+}
+
+/* ============ ANIMATED 3D BACKGROUND ============ */
+.bg-layer {
+  position: fixed; inset: 0; z-index: -2;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(124,92,255,0.25), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(34,211,238,0.20), transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(255,78,205,0.20), transparent 50%),
+    linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3));
+  background-size: 200% 200%, 200% 200%, 200% 200%, 100% 100%;
+  animation: bgShift 18s ease-in-out infinite;
+}
+@keyframes bgShift {
+  0%,100% { background-position: 0% 0%, 100% 0%, 50% 100%, 0 0; }
+  50%     { background-position: 100% 100%, 0% 100%, 0% 0%, 0 0; }
+}
+
+.orb {
+  position: fixed; border-radius: 50%; filter: blur(70px);
+  opacity: 0.5; z-index: -1; pointer-events: none;
+  animation: float 14s ease-in-out infinite;
+  will-change: transform;
+}
+.orb.a { width: 320px; height: 320px; background: #7c5cff; top: 10%; left: -80px; }
+.orb.b { width: 260px; height: 260px; background: #22d3ee; top: 55%; right: -60px; animation-delay: -4s; }
+.orb.c { width: 380px; height: 380px; background: #ff4ecd; bottom: -120px; left: 40%; animation-delay: -8s; opacity: 0.35; }
+@keyframes float {
+  0%,100% { transform: translate3d(0,0,0) scale(1); }
+  50%     { transform: translate3d(30px,-40px,0) scale(1.1); }
+}
+
+/* ============ NAVBAR ============ */
+.navbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--card-border);
+}
+.logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3));
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  text-shadow: 0 6px 30px rgba(124,92,255,0.4);
+}
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.theme-toggle {
+  width: 42px; height: 42px; border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer; font-size: 1.1rem;
+  display: grid; place-items: center;
+  transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+.theme-toggle:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 24px rgba(124,92,255,0.4); }
+.theme-toggle:active { transform: translateY(0) scale(0.96); }
+
+/* ============ HERO ============ */
+.hero {
+  text-align: center;
+  padding: 70px 20px 40px;
+  perspective: 1000px;
+}
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.2rem, 7vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  background: linear-gradient(135deg, #fff 10%, var(--accent-2) 45%, var(--accent-3) 90%);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  transform: translateZ(40px);
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.15),
+    0 8px 30px rgba(124,92,255,0.55),
+    0 20px 60px rgba(34,211,238,0.35);
+  animation: heroFloat 6s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes heroFloat {
+  0%,100% { transform: translate3d(0,0,40px); }
+  50%     { transform: translate3d(0,-10px,40px); }
+}
+.hero p {
+  margin-top: 16px; color: var(--muted);
+  font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+  max-width: 620px; margin-left: auto; margin-right: auto;
+}
+.hero .count {
+  display: inline-block; margin-top: 22px; padding: 6px 14px;
+  border-radius: 999px; font-size: 0.8rem; font-weight: 600;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(124,92,255,0.5);
+}
+
+/* ============ CONTROLS ============ */
+.controls {
+  max-width: 1200px; margin: 20px auto 0;
+  padding: 0 20px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.search-wrap {
+  position: relative;
+  transform-style: preserve-3d;
+}
+.search-wrap input {
+  width: 100%;
+  padding: 16px 20px 16px 52px;
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06);
+  transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
+}
+.search-wrap input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(124,92,255,0.2), 0 20px 40px rgba(124,92,255,0.35);
+  transform: translateY(-2px);
+}
+.search-wrap .icon {
+  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 1.1rem; pointer-events: none;
+}
+
+.chips {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  padding-bottom: 4px;
+}
+.chip {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.chip:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 10px 22px rgba(124,92,255,0.35); }
+.chip.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 12px 26px rgba(124,92,255,0.55);
+}
+
+/* ============ GRID ============ */
+.grid {
+  max-width: 1200px;
+  margin: 30px auto 80px;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 22px;
+  perspective: 1400px;
+}
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; gap: 18px; padding: 0 14px; }
+  .hero { padding-top: 50px; }
+}
+
+/* ============ 3D CARD ============ */
+.card {
+  position: relative;
+  border-radius: 20px;
+  padding: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-lg);
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s, opacity 0.6s, translate 0.6s;
+  will-change: transform;
+  opacity: 0; translate: 0 30px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.card.reveal { opacity: 1; translate: 0 0; }
+.card::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 20px;
+  background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.14), transparent 45%);
+  opacity: 0; transition: opacity 0.35s;
+  pointer-events: none;
+}
+.card:hover::before { opacity: 1; }
+.card:hover {
+  box-shadow:
+    0 40px 80px -20px rgba(0,0,0,0.7),
+    0 20px 40px -12px rgba(124,92,255,0.6),
+    0 0 0 1px rgba(124,92,255,0.4);
+}
+.card-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 10px; margin-bottom: 10px;
+}
+.card-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: grid; place-items: center;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, rgba(124,92,255,0.35), rgba(34,211,238,0.35));
+  box-shadow: 0 8px 20px rgba(124,92,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  transform: translateZ(30px);
+  animation: bob 4s ease-in-out infinite;
+}
+@keyframes bob {
+  0%,100% { transform: translate3d(0,0,30px); }
+  50%     { transform: translate3d(0,-4px,30px); }
+}
+.badge {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em;
+  padding: 5px 10px; border-radius: 999px;
+  text-transform: uppercase;
+  transform: translateZ(20px);
+}
+.badge.free     { background: rgba(34,197,94,0.18);  color: var(--green);  border: 1px solid rgba(34,197,94,0.4); }
+.badge.freemium { background: rgba(234,179,8,0.18);  color: var(--yellow); border: 1px solid rgba(234,179,8,0.4); }
+.badge.paid     { background: rgba(239,68,68,0.18);  color: var(--red);    border: 1px solid rgba(239,68,68,0.4); }
+
+.card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.15rem; font-weight: 700;
+  margin-bottom: 6px;
+  transform: translateZ(25px);
+  letter-spacing: -0.01em;
+}
+.card p {
+  color: var(--muted); font-size: 0.88rem; line-height: 1.5;
+  min-height: 44px;
+  transform: translateZ(15px);
+}
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 16px;
+  transform: translateZ(20px);
+}
+.cat-tag {
+  font-size: 0.72rem; color: var(--muted);
+  padding: 4px 10px; border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--card-border);
+}
+.visit {
+  text-decoration: none;
+  font-size: 0.85rem; font-weight: 600;
+  padding: 9px 16px; border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 8px 20px rgba(124,92,255,0.5), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: transform 0.15s, box-shadow 0.2s;
+  display: inline-block;
+}
+.visit:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(124,92,255,0.7); }
+.visit:active { transform: translateY(1px) scale(0.97); }
+
+/* ============ EMPTY STATE ============ */
+.empty {
+  grid-column: 1 / -1;
+  text-align: center; padding: 60px 20px;
+  color: var(--muted);
+}
+.empty .big { font-size: 3rem; margin-bottom: 10px; }
+
+/* ============ FOOTER ============ */
+footer {
+  text-align: center; padding: 40px 20px 30px;
+  color: var(--muted); font-size: 0.85rem;
+  border-top: 1px solid var(--card-border);
+  margin-top: 40px;
+}
+footer strong {
+  background: linear-gradient(135deg, var(--accent), var(--accent-3));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* ============ TOUCH: disable tilt ============ */
+@media (hover: none) {
+  .card:hover { box-shadow: var(--shadow-lg); }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="orb a"></div>
+<div class="orb b"></div>
+<div class="orb c"></div>
+
+<!-- ============ NAVBAR ============ -->
+<nav class="navbar">
+  <div class="logo">yoLl <span style="opacity:.6;font-weight:400;font-size:.85rem;">AI Directory</span></div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeBtn" aria-label="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <h1>The AI Tools Universe</h1>
+  <p>Discover the best AI tools for images, writing, coding, video, audio and more — free, freemium, and premium, all in one 3D directory.</p>
+  <div class="count" id="count">Loading…</div>
+</section>
+
+<!-- ============ CONTROLS ============ -->
+<section class="controls">
+  <div class="search-wrap">
+    <span class="icon">🔎</span>
+    <input type="text" id="search" placeholder="Search tools by name or description…" aria-label="Search tools">
+  </div>
+  <div class="chips" id="catChips"></div>
+  <div class="chips" id="priceChips"></div>
+</section>
+
+<!-- ============ GRID ============ -->
+<main class="grid" id="grid"></main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  Built with 💜 by <strong>yoLl</strong> · A curated 3D AI tools directory · <span id="year"></span>
+</footer>
+
+<script>
+/* ============================================================
+   DATA — every tool: name, desc, category, pricing, url, icon
+   ============================================================ */
+const tools = [
+  // 🖼️ IMAGE GENERATION
+  { n:"Midjourney", d:"Stunning AI art from text prompts, known for its artistic quality.", c:"Image", p:"paid", u:"https://midjourney.com", i:"🖼️" },
+  { n:"DALL·E 3", d:"OpenAI's image generator integrated in ChatGPT & Bing.", c:"Image", p:"freemium", u:"https://openai.com/dall-e-3", i:"🎨" },
+  { n:"Stable Diffusion", d:"Open-source image model you can run locally or in the cloud.", c:"Image", p:"free", u:"https://stability.ai", i:"🌌" },
+  { n:"Leonardo AI", d:"Game-art focused image generation with fine-tuned models.", c:"Image", p:"freemium", u:"https://leonardo.ai", i:"🖌️" },
+  { n:"Adobe Firefly", d:"Adobe's generative AI for images, integrated into Creative Cloud.", c:"Image", p:"freemium", u:"https://firefly.adobe.com", i:"🔥" },
+  { n:"Ideogram", d:"AI image generator that renders text inside images accurately.", c:"Image", p:"freemium", u:"https://ideogram.ai", i:"💡" },
+
+  // ✍️ WRITING
+  { n:"ChatGPT", d:"OpenAI's conversational AI for writing, Q&A, and creativity.", c:"Writing", p:"freemium", u:"https://chat.openai.com", i:"✍️" },
+  { n:"Claude", d:"Anthropic's thoughtful AI assistant, great for long documents.", c:"Writing", p:"freemium", u:"https://claude.ai", i:"📝" },
+  { n:"Jasper", d:"AI marketing copywriter for blogs, ads, and social posts.", c:"Writing", p:"paid", u:"https://jasper.ai", i:"🪄" },
+  { n:"Copy.ai", d:"Generate marketing copy, sales emails and blog ideas fast.", c:"Writing", p:"freemium", u:"https://copy.ai", i:"✒️" },
+  { n:"Grammarly", d:"AI writing assistant for grammar, tone, and clarity.", c:"Writing", p:"freemium", u:"https://grammarly.com", i:"✅" },
+  { n:"Writesonic", d:"AI writer for SEO articles, ads and product descriptions.", c:"Writing", p:"freemium", u:"https://writesonic.com", i:"📰" },
+
+  // 💻 CODING
+  { n:"GitHub Copilot", d:"AI pair programmer that autocompletes code in your editor.", c:"Coding", p:"paid", u:"https://github.com/features/copilot", i:"🐙" },
+  { n:"Cursor", d:"AI-first code editor built for pair-programming with AI.", c:"Coding", p:"freemium", u:"https://cursor.sh", i:"⚡" },
+  { n:"Tabnine", d:"Privacy-focused AI code completion for teams.", c:"Coding", p:"freemium", u:"https://tabnine.com", i:"🧩" },
+  { n:"Replit AI", d:"AI assistant inside Replit IDE for code, debug and deploy.", c:"Coding", p:"freemium", u:"https://replit.com", i:"🛠️" },
+  { n:"Codeium", d:"Free AI autocomplete & chat for 70+ languages.", c:"Coding", p:"free", u:"https://codeium.com", i:"💠" },
+  { n:"Amazon CodeWhisperer", d:"AWS's AI coding companion, free for individuals.", c:"Coding", p:"freemium", u:"https://aws.amazon.com/codewhisperer", i:"📦" },
+
+  // 🎬 VIDEO
+  { n:"Runway", d:"AI video generation and editing suite (Gen-3).", c:"Video", p:"freemium", u:"https://runwayml.com", i:"🎬" },
+  { n:"Pika", d:"Turn text or images into short cinematic AI videos.", c:"Video", p:"freemium", u:"https://pika.art", i:"🎥" },
+  { n:"Sora", d:"OpenAI's text-to-video model for realistic clips.", c:"Video", p:"paid", u:"https://openai.com/sora", i:"🌀" },
+  { n:"Synthesia", d:"Create AI avatar videos for training & marketing.", c:"Video", p:"paid", u:"https://synthesia.io", i:"🧑‍💼" },
+  { n:"HeyGen", d:"AI spokesperson videos with realistic avatars & voice clones.", c:"Video", p:"freemium", u:"https://heygen.com", i:"🗣️" },
+  { n:"Luma Dream Machine", d:"High-quality AI video generation from text/images.", c:"Video", p:"freemium", u:"https://lumalabs.ai/dream-machine", i:"🌠" },
+
+  // 🎵 AUDIO
+  { n:"Suno", d:"Generate full songs with vocals from a text prompt.", c:"Audio", p:"freemium", u:"https://suno.com", i:"🎵" },
+  { n:"ElevenLabs", d:"Ultra-realistic AI voice generation and cloning.", c:"Audio", p:"freemium", u:"https://elevenlabs.io", i:"🔊" },
+  { n:"Murf AI", d:"Studio-quality AI voiceovers for videos & ads.", c:"Audio", p:"freemium", u:"https://murf.ai", i:"🎙️" },
+  { n:"AIVA", d:"AI composer for cinematic and background music.", c:"Audio", p:"freemium", u:"https://aiva.ai", i:"🎼" },
+  { n:"Udio", d:"AI music generation rival to Suno, with strong vocals.", c:"Audio", p:"freemium", u:"https://udio.com", i:"🎧" },
+  { n:"Play.ht", d:"Realistic AI text-to-speech for podcasts & articles.", c:"Audio", p:"freemium", u:"https://play.ht", i:"📢" },
+
+  // 📊 PRODUCTIVITY
+  { n:"Notion AI", d:"AI writing, summarizing & Q&A inside Notion.", c:"Productivity", p:"paid", u:"https://notion.so/product/ai", i:"📓" },
+  { n:"Mem", d:"AI-powered notes that organize themselves.", c:"Productivity", p:"freemium", u:"https://mem.ai", i:"🧠" },
+  { n:"Taskade", d:"AI to-do lists, mind maps and team workspaces.", c:"Productivity", p:"freemium", u:"https://taskade.com", i:"✅" },
+  { n:"Motion", d:"AI calendar that auto-plans your day and tasks.", c:"Productivity", p:"paid", u:"https://usemotion.com", i:"📅" },
+  { n:"Reclaim AI", d:"AI scheduling for habits, tasks and meetings.", c:"Productivity", p:"freemium", u:"https://reclaim.ai", i:"⏱️" },
+
+  // 🔍 RESEARCH
+  { n:"Perplexity", d:"AI answer engine with cited, real-time web sources.", c:"Research", p:"freemium", u:"https://perplexity.ai", i:"🔍" },
+  { n:"Elicit", d:"AI research assistant for literature reviews.", c:"Research", p:"freemium", u:"https://elicit.com", i:"📚" },
+  { n:"Consensus", d:"Search scientific papers and get AI summaries.", c:"Research", p:"freemium", u:"https://consensus.app", i:"🔬" },
+  { n:"Scite", d:"AI-powered citation and reference checking.", c:"Research", p:"freemium", u:"https://scite.ai", i:"📑" },
+  { n:"You.com", d:"AI search engine with multi-model chat.", c:"Research", p:"freemium", u:"https://you.com", i:"🌐" },
+
+  // 🎨 DESIGN
+  { n:"Figma AI", d:"AI features inside Figma for design and prototyping.", c:"Design", p:"freemium", u:"https://figma.com", i:"🎨" },
+  { n:"Uizard", d:"Turn text or sketches into editable UI designs.", c:"Design", p:"freemium", u:"https://uizard.io", i:"📱" },
+  { n:"Galileo AI", d:"Generate beautiful UI from a text prompt.", c:"Design", p:"paid", u:"https://usegalileo.ai", i:"✨" },
+  { n:"Framer AI", d:"Generate and publish full websites with AI.", c:"Design", p:"freemium", u:"https://framer.com", i:"🖥️" },
+  { n:"Khroma", d:"AI color palette generator that learns your taste.", c:"Design", p:"free", u:"https://khroma.co", i:"🌈" },
+
+  // 🤖 CHATBOTS
+  { n:"Gemini", d:"Google's multimodal AI assistant across apps.", c:"Chatbots", p:"freemium", u:"https://gemini.google.com", i:"♊" },
+  { n:"Grok", d:"xAI's witty chatbot with real-time X data.", c:"Chatbots", p:"freemium", u:"https://grok.com", i:"🤖" },
+  { n:"Poe", d:"Quora's hub to chat with many AI models in one app.", c:"Chatbots", p:"freemium", u:"https://poe.com", i:"💬" },
+  { n:"Character.AI", d:"Chat with AI characters and custom personas.", c:"Chatbots", p:"freemium", u:"https://character.ai", i:"🎭" },
+  { n:"Pi", d:"Inflection's empathetic personal AI companion.", c:"Chatbots", p:"free", u:"https://pi.ai", i:"🫧" },
+
+  // 📈 MARKETING
+  { n:"Surfer SEO", d:"AI-driven SEO content optimization and audits.", c:"Marketing", p:"paid", u:"https://surferseo.com", i:"📈" },
+  { n:"AdCreative.ai", d:"Generate high-converting ad creatives with AI.", c:"Marketing", p:"paid", u:"https://adcreative.ai", i:"📣" },
+  { n:"Brandwell", d:"AI content + SEO writer for brands (formerly Content at Scale).", c:"Marketing", p:"paid", u:"https://brandwell.ai", i:"🏷️" },
+  { n:"Frase", d:"AI research & content briefs for SEO writers.", c:"Marketing", p:"freemium", u:"https://frase.io", i:"🔎" },
+  { n:"HubSpot AI", d:"AI content, email and CRM assistance for marketers.", c:"Marketing", p:"freemium", u:"https://hubspot.com/artificial-intelligence", i:"🧲" }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = { cat: "All", price: "All", q: "" };
+const catIcons = {
+  All: "🌟", Image: "🖼️", Writing: "✍️", Coding: "💻", Video: "🎬",
+  Audio: "🎵", Productivity: "📊", Research: "🔍",
+  Design: "🎨", Chatbots: "🤖", Marketing: "📈"
+};
+const categories = ["All", "Image", "Writing", "Coding", "Video", "Audio", "Productivity", "Research", "Design", "Chatbots", "Marketing"];
+const priceLabels = { All: "All Prices", free: "Free", freemium: "Freemium", paid: "Paid" };
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const grid = document.getElementById("grid");
+const searchInput = document.getElementById("search");
+const catChips = document.getElementById("catChips");
+const priceChips = document.getElementById("priceChips");
+const countEl = document.getElementById("count");
+
+function buildChips() {
+  categories.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "chip" + (c === state.cat ? " active" : "");
+    b.innerHTML = `${catIcons[c]} ${c}`;
+    b.onclick = () => { state.cat = c; refreshChips(); render(); };
+    b.dataset.cat = c;
+    catChips.appendChild(b);
+  });
+  Object.keys(priceLabels).forEach(p => {
+    const b = document.createElement("button");
+    b.className = "chip" + (p === state.price ? " active" : "");
+    b.textContent = priceLabels[p];
+    b.onclick = () => { state.price = p; refreshChips(); render(); };
+    b.dataset.price = p;
+    priceChips.appendChild(b);
+  });
+}
+function refreshChips() {
+  [...catChips.children].forEach(b => b.classList.toggle("active", b.dataset.cat === state.cat));
+  [...priceChips.children].forEach(b => b.classList.toggle("active", b.dataset.price === state.price));
+}
+
+function render() {
+  const q = state.q.trim().toLowerCase();
+  const list = tools.filter(t => {
+    if (state.cat !== "All" && t.c !== state.cat) return false;
+    if (state.price !== "All" && t.p !== state.price) return false;
+    if (q && !(t.n.toLowerCase().includes(q) || t.d.toLowerCase().includes(q) || t.c.toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  countEl.textContent = `${tools.length} tools · showing ${list.length}`;
+
+  grid.innerHTML = "";
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty"><div class="big">🛸</div><div>No tools match your filters.</div></div>`;
+    return;
+  }
+
+  list.forEach((t, idx) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.transitionDelay = (idx % 12) * 30 + "ms";
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-icon">${t.i}</div>
+        <span class="badge ${t.p}">${t.p}</span>
+      </div>
+      <h3>${t.n}</h3>
+      <p>${t.d}</p>
+      <div class="card-footer">
+        <span class="cat-tag">${catIcons[t.c]} ${t.c}</span>
+        <a class="visit" href="${t.u}" target="_blank" rel="noopener">Visit →</a>
+      </div>
+    `;
+    grid.appendChild(card);
+    requestAnimationFrame(() => card.classList.add("reveal"));
+    attach3DTilt(card);
+  });
+}
+
+/* ============================================================
+   3D TILT (desktop only)
+   ============================================================ */
+const isHoverable = window.matchMedia("(hover: hover)").matches;
+function attach3DTilt(card) {
+  if (!isHoverable) return;
+  card.addEventListener("mousemove", e => {
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    const cx = r.width / 2, cy = r.height / 2;
+    const rotX = ((y - cy) / cy) * -8;
+    const rotY = ((x - cx) / cx) * 8;
+    card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(8px) scale(1.02)`;
+    card.style.setProperty("--mx", x + "px");
+    card.style.setProperty("--my", y + "px");
+  });
+  card.addEventListener("mouseleave", () => {
+    card.style.transform = "";
+  });
+}
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+let searchTimer;
+searchInput.addEventListener("input", e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { state.q = e.target.value; render(); }, 120);
+});
+
+/* ============================================================
+   THEME
+   ============================================================ */
+const themeBtn = document.getElementById("themeBtn");
+const root = document.documentElement;
+const saved = localStorage.getItem("yoll-theme");
+if (saved) {
+  root.dataset.theme = saved;
+  themeBtn.textContent = saved === "dark" ? "🌙" : "☀️";
+}
+themeBtn.onclick = () => {
+  const next = root.dataset.theme === "dark" ? "light" : "dark";
+  root.dataset.theme = next;
+  themeBtn.textContent = next === "dark" ? "🌙" : "☀️";
+  localStorage.setItem("yoll-theme", next);
+};
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.getElementById("year").textContent = new Date().getFullYear();
+buildChips();
+render();
+</script>
+</body>
+</html>
