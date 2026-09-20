@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://panduvv2527-commits.github.io/yoLL/sitemap.xml
